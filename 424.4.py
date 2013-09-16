@@ -54,6 +54,9 @@ def makeList():
         myList.append(person)
     return myList
 
+def ints_to_Strings(number):
+        return "${0:0.2f}".format(number)
+
 def main ():
 
     # Make intro window
@@ -69,9 +72,11 @@ def main ():
             if username == person.getUserName() and pin == person.getPin():
                 correctInfo = True
                 customer = person
+                break
 
         # inform user incorrect information entered
-        win.incorrectInput()
+        if not correctInfo:
+            win.incorrectInput()
 
     # close window and continue if correct info entered
     win.close()
@@ -82,36 +87,16 @@ def main ():
         optionsWin = OptionsWindow()
 
         # Convert ints to strings
-        checkingbalance = customer.getChecking()
-        checkingbalance = int(checkingbalance)
-        if 1000 <= checkingbalance <= 10000:
-            cbStr = str(checkingbalance)
-            checkingbalance =  '$' + cbStr[0] + ',' + cbStr[1] + cbStr[2] + cbStr[3]
-        elif checkingbalance < 1000:
-            checkingbalance = '$' + str(checkingbalance)
-        else:
-            cbStr = str(checkingbalance)
-            checkingbalance = '$' + cbStr[0] + cbStr[1] + ',' + cbStr[2] + cbStr[3]\
-            + cbStr[4]
-        savingsbalance = customer.getSavings()
-        savingsbalance = int(savingsbalance)
-        if 1000 <= savingsbalance <= 10000:
-            cbStr = str(savingsbalance)
-            savingsbalance =  '$' + cbStr[0] + ',' + cbStr[1] + cbStr[2] + cbStr[3]
-        elif savingsbalance < 1000:
-            savingsbalance = '$' + str(savingsbalance)
-        else:
-            cbStr = str(savingsbalance)
-            savingsbalance = '$' + cbStr[0] + cbStr[1] + ',' + cbStr[2] + cbStr[3]\
-            + cbStr[4]
+        checkingBalance = ints_to_Strings(customer.getChecking())
+        savingsBalance = ints_to_Strings(customer.getSavings())
 
         # User chooses from three options and chooses checking or savings
-        action, account  = optionsWin.choose(checkingbalance, savingsbalance)
+        action, account  = optionsWin.choose(checkingBalance, savingsBalance)
         optionsWin.close()
         if account == 'From Checking':
-            balance = checkingbalance
+            balance = checkingBalance
         elif account == 'From Savings':
-            balance = savingsbalance
+            balance = savingsBalance
 
         # if user chooses check balances
         if action == 'Check Balances':
@@ -127,26 +112,12 @@ def main ():
         elif action == 'Withdraw Cash':
             win = WithdrawWindow()
             # user chooses amount to withdraw
+            # get rid of dollar signs and commas, and convert to int
             choice = win.choose()
-            if choice == "$20":
-                amount = 20
-            elif choice == "$40":
-                amount = 40
-            elif choice == "$60":
-                amount = 60
-            elif choice == "$80":
-                amount = 80
-            elif choice == "$100":
-                amount = 100
-            elif choice == "$200":
-                amount = 200
-            elif choice == "$500":
-                amount = 500
-            elif choice == "$1,000":
-                amount = 1000
-            if balance == checkingbalance:
+            amount = int(choice.strip("$").strip(","))
+            if balance == checkingBalance:
                 customer.withdrawFromChecking(amount)
-            elif balance == savingsbalance:
+            elif balance == savingsBalance:
                 customer.withdrawFromSavings(amount)
              # After withdrawing cash
             win.close()
@@ -166,8 +137,7 @@ def main ():
             type = win.choose()
             # amount to transfer
             amount = win.input.getText()
-            amount.strip(',')
-            amount = int(amount)
+            amount = int(amount.strip("$").strip(","))
 
             if type == 'From checking to savings':
                 customer.withdrawFromChecking(amount)
@@ -197,25 +167,6 @@ def main ():
         savings = customer.getSavings()
         print (name, username, pin, checking, savings, file=outfile)
     outfile.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
